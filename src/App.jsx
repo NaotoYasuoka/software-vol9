@@ -12,12 +12,13 @@ export default class App extends React.Component {
     this.state = {
       turn : 0,
       data: [
-        [0 , -1, -1],
-        [0 ,  1,  0],
-        [0 ,  1,  0],
+        [0 , 0, 0],
+        [0 , 0, 0],
+        [0 , 0, 0],
       ],
     };
     this.setMark = this.setMark.bind(this);
+    this.judge = this.judge.bind(this);
   }
 
   alertPopup() {
@@ -34,9 +35,9 @@ export default class App extends React.Component {
 
   getMark(value) {
     var return_value;
-    if(value == "〇"){
+    if(value == 1){
       return_value = "〇";
-    }else if(value == "×"){
+    }else if(value == 2){
       return_value = "×";
     }else{
       return_value = "";
@@ -46,15 +47,52 @@ export default class App extends React.Component {
 
   setMark(i, j) {
     var s = this.state; // stateの内容を取得
+    if(s.data[i][j] != 0){
+      return;
+    }
     if( s.turn % 2 ){
-      s.data[i][j] = "〇";
+      s.data[i][j] = 1;
     }else{
-      s.data[i][j] = "×";
+      s.data[i][j] = 2;
     }
     s.turn += 1;
     this.setState(s);
+
+
+    var j = this.judge();
+    if(j == 0){
+      notification.alert("引き分け！！");
+      this.setState({data:[[0,0,0],[0,0,0],[0,0,0]], turn:0})
+    }else if(j == 1){
+      notification.alert("○の勝ち");
+      this.setState({data:[[0,0,0],[0,0,0],[0,0,0]], turn:0})
+    }else if(j == 2){
+      notification.alert("×の勝ち");
+      this.setState({data:[[0,0,0],[0,0,0],[0,0,0]], turn:0})
+    }
   }
 
+  judge(){
+    var data = this.state.data;
+    for(var i=0; i <= 2 ; i++){
+      if((data[i][0] == data[i][1]) && (data[i][1] == data[i][2]) && (data[i][0] != 0)){
+        return data[i][0];
+      }
+      if((data[0][i] == data[1][i]) && (data[1][i] == data[2][i]) && (data[0][i] != 0)){
+        return data[0][i];
+      }
+    }
+    if((data[0][0] == data[1][1]) && (data[1][1] == data[2][2]) && (data[0][0] != 0)){
+      return data[0][0];
+    }else if((data[0][2] == data[1][1]) && (data[1][1] == data[2][0]) && (data[2][0] != 0)){
+      return data[0][0];
+    }
+    if(this.state.turn == 9){
+      return 0;
+    }
+    return 99;
+
+  }
 
   render() {
     return (
